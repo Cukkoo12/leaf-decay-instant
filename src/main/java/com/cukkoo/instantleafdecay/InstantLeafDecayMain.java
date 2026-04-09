@@ -38,6 +38,8 @@ public class InstantLeafDecayMain implements ModInitializer {
 
 		// KOMUT SISTEMI KAYDI
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			// NOT: Komutlar su an herkese acik. Multiplayer sunucuda LuckPerms gibi
+			// permission modu ile /leafdecay komutunu kisitlayabilirsiniz.
 			dispatcher.register(literal("leafdecay")
 					// 1. RELOAD KOMUTU
 					.then(literal("reload")

@@ -29,6 +29,24 @@ Leaves decay instantly when trees are cut. No more floating leaf blobs!
 
 Config file is created on first launch at `config/instant_leaf_decay.json`.
 
+## Commands
+
+Configuration can also be changed in-game using commands (requires OP level 2):
+
+- `/leafdecay reload` — Reload config from disk
+- `/leafdecay set <option> <value>` — Change any option at runtime
+
+**Available options for `set`:**
+`enabled`, `particles`, `sound`, `chainDecay`, `requirePlayerNearby`, `decayTicks`, `particleCount`, `chainDelay`, `soundChance`, `soundVolume`, `soundPitchMin`, `soundPitchMax`, `extraSaplingChance`, `extraStickChance`, `extraAppleChance`, `playerRadius`, `particleType`
+
+**Examples:**
+```
+/leafdecay set chainDecay true
+/leafdecay set soundChance 0.5
+/leafdecay set particleType composter
+/leafdecay reload
+```
+
 ### Core
 
 | Option | Type | Default | Description |
