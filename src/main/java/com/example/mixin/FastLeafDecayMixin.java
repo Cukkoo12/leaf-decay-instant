@@ -1,5 +1,6 @@
 package com.example.mixin;
 
+import com.example.ExampleMod;
 import com.example.InstantLeafDecayConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,7 +33,6 @@ public class FastLeafDecayMixin {
     private static void idc$rollExtraDrops(ServerLevel level, BlockPos pos, BlockState state, RandomSource random) {
         Block leafBlock = state.getBlock();
 
-        // Fidan
         if (InstantLeafDecayConfig.EXTRA_SAPLING_CHANCE > 0.0) {
             Item sapling = idc$getSaplingFor(leafBlock);
             if (sapling != null) {
@@ -47,7 +47,6 @@ public class FastLeafDecayMixin {
             }
         }
 
-        // Sopa
         if (InstantLeafDecayConfig.EXTRA_STICK_CHANCE > 0.0) {
             int rolls = (int) InstantLeafDecayConfig.EXTRA_STICK_CHANCE;
             double remainder = InstantLeafDecayConfig.EXTRA_STICK_CHANCE - rolls;
@@ -59,7 +58,6 @@ public class FastLeafDecayMixin {
             }
         }
 
-        // Elma (sadece oak ve dark_oak)
         if (InstantLeafDecayConfig.EXTRA_APPLE_CHANCE > 0.0
                 && (leafBlock == Blocks.OAK_LEAVES || leafBlock == Blocks.DARK_OAK_LEAVES)) {
             int rolls = (int) InstantLeafDecayConfig.EXTRA_APPLE_CHANCE;
@@ -94,6 +92,7 @@ public class FastLeafDecayMixin {
         entity.setDefaultPickUpDelay();
         level.addFreshEntity(entity);
     }
+
     private static boolean idc$isBlacklisted(BlockState state) {
         if (InstantLeafDecayConfig.BLACKLISTED_LEAVES.isEmpty()) return false;
         String id = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
@@ -173,6 +172,19 @@ public class FastLeafDecayMixin {
         if (!state.getValue(LeavesBlock.PERSISTENT)
                 && state.getValue(LeavesBlock.DISTANCE) >= 5) {
 
+            // ZINCIRLEME MOD: kuyruga ekle, vanilla tick'i iptal et
+            if (InstantLeafDecayConfig.CHAIN_DECAY && InstantLeafDecayConfig.CHAIN_DELAY > 0) {
+                long key = pos.asLong();
+                if (!ExampleMod.CHAIN_QUEUE.containsKey(key)) {
+                    int extra = random.nextInt(InstantLeafDecayConfig.CHAIN_DELAY * 6 + 1);
+                    long target = level.getGameTime() + InstantLeafDecayConfig.DECAY_TICKS + extra;
+                    ExampleMod.CHAIN_QUEUE.put(key, target);
+                }
+                ci.cancel();
+                return;
+            }
+
+            // NORMAL MOD: aninda curume
             if (InstantLeafDecayConfig.PARTICLES && InstantLeafDecayConfig.PARTICLE_COUNT > 0) {
                 level.sendParticles(
                         new BlockParticleOption(ParticleTypes.BLOCK, state),
@@ -192,11 +204,10 @@ public class FastLeafDecayMixin {
                         pitch
                 );
             }
+
             idc$rollExtraDrops(level, pos, state, random);
             level.destroyBlock(pos, true);
             ci.cancel();
-
         }
     }
-
 }

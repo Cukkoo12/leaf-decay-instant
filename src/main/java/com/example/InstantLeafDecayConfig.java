@@ -32,6 +32,9 @@ public class InstantLeafDecayConfig {
     public static double EXTRA_SAPLING_CHANCE = 0.0;
     public static double EXTRA_STICK_CHANCE = 0.0;
     public static double EXTRA_APPLE_CHANCE = 0.0;
+    // Zincirleme curume
+    public static boolean CHAIN_DECAY = false;
+    public static int CHAIN_DELAY = 2;
     // Performans
     public static boolean REQUIRE_PLAYER_NEARBY = false;
     public static double PLAYER_RADIUS = 64.0;
@@ -60,6 +63,8 @@ public class InstantLeafDecayConfig {
                     EXTRA_SAPLING_CHANCE = Math.max(0.0, data.extraSaplingChance);
                     EXTRA_STICK_CHANCE = Math.max(0.0, data.extraStickChance);
                     EXTRA_APPLE_CHANCE = Math.max(0.0, data.extraAppleChance);
+                    CHAIN_DECAY = data.chainDecay;
+                    CHAIN_DELAY = Math.max(0, data.chainDelay);
                     REQUIRE_PLAYER_NEARBY = data.requirePlayerNearby;
                     PLAYER_RADIUS = Math.max(1.0, data.playerRadius);
                 }
@@ -102,6 +107,8 @@ public class InstantLeafDecayConfig {
         double extraSaplingChance = EXTRA_SAPLING_CHANCE;
         double extraStickChance = EXTRA_STICK_CHANCE;
         double extraAppleChance = EXTRA_APPLE_CHANCE;
+        boolean chainDecay = CHAIN_DECAY;
+        int chainDelay = CHAIN_DELAY;
         boolean requirePlayerNearby = REQUIRE_PLAYER_NEARBY;
         double playerRadius = PLAYER_RADIUS;
     }
