@@ -41,14 +41,16 @@ public class InstantLeafDecayMain implements ModInitializer {
 			// NOT: Komutlar su an herkese acik. Multiplayer sunucuda LuckPerms gibi
 			// permission modu ile /leafdecay komutunu kisitlayabilirsiniz.
 			dispatcher.register(literal("leafdecay")
-					// 1. RELOAD KOMUTU
-					.then(literal("reload")
-							.executes(context -> {
-								InstantLeafDecayConfig.load();
-								context.getSource().sendSuccess(() -> Component.literal("§a[HizliYaprak] Config dosyadan yenilendi!"), true);
-								return 1;
-							})
-					)
+					.requires(source -> {
+						try {
+							// Reflection ile permissionLevel'e eris
+							java.lang.reflect.Field field = source.getClass().getDeclaredField("permissionLevel");
+							field.setAccessible(true);
+							return (int) field.get(source) >= 2;
+						} catch (Exception e) {
+							return true; // Hata olursa herkese izin ver
+						}
+					})
 					// 2. TUM AYARLAR ICIN SET KOMUTLARI
 					.then(literal("set")
 							// --- BOOLEANS (true/false) ---
