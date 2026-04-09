@@ -1,3 +1,18 @@
+## What's New in 2.0
+
+Version 2.0 marks the mod's maturity milestone. Since 1.0, the mod has grown to include:
+
+- Chain decay mode with satisfying cascading waves
+- Full in-game command system (`/leafdecay set <option> <value>`)
+- Configurable extra drops for saplings, sticks, and apples
+- Multiple sound variants with configurable chance
+- Particle type selection (block, composter, happy villager)
+- Performance options (nearby-player-only mode)
+- Blacklists for specific leaves and dimensions
+- 20+ configurable options
+
+Future versions will focus on multi-loader support (Forge, NeoForge) and backporting to older Minecraft versions.
+
 # Instant Leaf Decay
 
 Leaves decay instantly when trees are cut. No more floating leaf blobs!
@@ -103,6 +118,44 @@ Supported sound IDs: `minecraft:block.grass.break`, `minecraft:block.azalea_leav
 |--------|------|---------|-------------|
 | `requirePlayerNearby` | bool | `false` | Only decay near players |
 | `playerRadius` | float | `64.0` | Player detection radius |
+## Commands
+
+The mod provides an in-game command system to change config values at runtime without editing files. All settings can be changed live, and changes are automatically saved to the config file.
+
+> **Note:** Commands are currently available to all players. On multiplayer servers, use a permission mod (e.g. LuckPerms with fabric-permissions-api) to restrict `/leafdecay` to staff.
+
+### Reload config
+/leafdecay reload
+
+Reloads the config file from disk. Useful after manual edits.
+
+### Change a setting
+/leafdecay reload
+
+Reloads the config file from disk. Useful after manual edits.
+
+### Change a setting
+/leafdecay set <option> <value>
+
+**Boolean options** (`true` / `false`):
+`enabled`, `particles`, `sound`, `chainDecay`, `requirePlayerNearby`
+
+**Integer options**:
+`decayTicks`, `particleCount`, `chainDelay`
+
+**Decimal options**:
+`soundChance` (0.0-1.0), `soundVolume` (0.0-1.0), `soundPitchMin`, `soundPitchMax`, `extraSaplingChance`, `extraStickChance`, `extraAppleChance`, `playerRadius`
+
+**String options**:
+`particleType` (`block`, `composter`, or `happy`)
+
+### Examples
+/leafdecay set chainDecay true
+/leafdecay set chainDelay 3
+/leafdecay set soundChance 0.5
+/leafdecay set particleType composter
+/leafdecay set extraSaplingChance 2.0
+/leafdecay reload
 
 ## Compatibility
 
@@ -110,7 +163,7 @@ Supported sound IDs: `minecraft:block.grass.break`, `minecraft:block.azalea_leav
 - **Minecraft:** 26.1
 - **Requires:** Fabric API
 - **Side:** Server-side (clients don't need it)
-- **Modded Trees:** 100% compatible out-of-the-box with popular biome mods including **Biomes O' Plenty**, **Terralith**, **Twilight Forest**, and **Nature's Spirit**. (Works automatically with any mod that extends the base `LeavesBlock`).
+- **Modded Trees:** Should work automatically with any mod that extends the base `LeavesBlock`. Most popular biome mods (Biomes O' Plenty, Terralith, Twilight Forest, Nature's Spirit) do this by default, though compatibility has not been officially tested.
 
 Support for older versions and Forge/NeoForge coming soon.
 

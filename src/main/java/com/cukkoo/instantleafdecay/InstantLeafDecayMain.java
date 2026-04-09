@@ -1,12 +1,9 @@
 package com.cukkoo.instantleafdecay;
 
-import com.mojang.brigadier.arguments.BoolArgumentType;
-import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.arguments.FloatArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.arguments.*;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -35,6 +32,8 @@ public class InstantLeafDecayMain implements ModInitializer {
 	public void onInitialize() {
 		InstantLeafDecayConfig.load();
 		System.out.println("[HizliYaprak] Mod yuklendi!");
+		// Sunucu kapanirken kuyrugu temizle
+		ServerLifecycleEvents.SERVER_STOPPING.register(server -> CHAIN_QUEUE.clear());
 
 		// KOMUT SISTEMI KAYDI
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
