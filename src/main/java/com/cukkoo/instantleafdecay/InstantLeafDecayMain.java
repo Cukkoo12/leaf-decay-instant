@@ -1,11 +1,18 @@
 package com.cukkoo.instantleafdecay;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -17,6 +24,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static net.minecraft.commands.Commands.argument;
+import static net.minecraft.commands.Commands.literal;
+
 public class InstantLeafDecayMain implements ModInitializer {
 
 	public static final Map<Long, Long> CHAIN_QUEUE = new ConcurrentHashMap<>();
@@ -26,6 +36,152 @@ public class InstantLeafDecayMain implements ModInitializer {
 		InstantLeafDecayConfig.load();
 		System.out.println("[HizliYaprak] Mod yuklendi!");
 
+		// KOMUT SISTEMI KAYDI
+		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+			dispatcher.register(literal("leafdecay")
+					// 1. RELOAD KOMUTU
+					.then(literal("reload")
+							.executes(context -> {
+								InstantLeafDecayConfig.load();
+								context.getSource().sendSuccess(() -> Component.literal("§a[HizliYaprak] Config dosyadan yenilendi!"), true);
+								return 1;
+							})
+					)
+					// 2. TUM AYARLAR ICIN SET KOMUTLARI
+					.then(literal("set")
+							// --- BOOLEANS (true/false) ---
+							.then(literal("enabled").then(argument("value", BoolArgumentType.bool()).executes(context -> {
+								boolean val = BoolArgumentType.getBool(context, "value");
+								InstantLeafDecayConfig.ENABLED = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] enabled ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("particles").then(argument("value", BoolArgumentType.bool()).executes(context -> {
+								boolean val = BoolArgumentType.getBool(context, "value");
+								InstantLeafDecayConfig.PARTICLES = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] particles ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("sound").then(argument("value", BoolArgumentType.bool()).executes(context -> {
+								boolean val = BoolArgumentType.getBool(context, "value");
+								InstantLeafDecayConfig.SOUND = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] sound ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("chainDecay").then(argument("value", BoolArgumentType.bool()).executes(context -> {
+								boolean val = BoolArgumentType.getBool(context, "value");
+								InstantLeafDecayConfig.CHAIN_DECAY = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] chainDecay ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("requirePlayerNearby").then(argument("value", BoolArgumentType.bool()).executes(context -> {
+								boolean val = BoolArgumentType.getBool(context, "value");
+								InstantLeafDecayConfig.REQUIRE_PLAYER_NEARBY = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] requirePlayerNearby ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+
+							// --- INTEGERS (Tam Sayılar) ---
+							.then(literal("decayTicks").then(argument("value", IntegerArgumentType.integer(0)).executes(context -> {
+								int val = IntegerArgumentType.getInteger(context, "value");
+								InstantLeafDecayConfig.DECAY_TICKS = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] decayTicks ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("particleCount").then(argument("value", IntegerArgumentType.integer(0)).executes(context -> {
+								int val = IntegerArgumentType.getInteger(context, "value");
+								InstantLeafDecayConfig.PARTICLE_COUNT = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] particleCount ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("chainDelay").then(argument("value", IntegerArgumentType.integer(0)).executes(context -> {
+								int val = IntegerArgumentType.getInteger(context, "value");
+								InstantLeafDecayConfig.CHAIN_DELAY = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] chainDelay ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+
+							// --- DOUBLES (Ondalık Sayılar) ---
+							.then(literal("soundChance").then(argument("value", DoubleArgumentType.doubleArg(0.0, 1.0)).executes(context -> {
+								double val = DoubleArgumentType.getDouble(context, "value");
+								InstantLeafDecayConfig.SOUND_CHANCE = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] soundChance ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("extraSaplingChance").then(argument("value", DoubleArgumentType.doubleArg(0.0)).executes(context -> {
+								double val = DoubleArgumentType.getDouble(context, "value");
+								InstantLeafDecayConfig.EXTRA_SAPLING_CHANCE = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] extraSaplingChance ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("extraStickChance").then(argument("value", DoubleArgumentType.doubleArg(0.0)).executes(context -> {
+								double val = DoubleArgumentType.getDouble(context, "value");
+								InstantLeafDecayConfig.EXTRA_STICK_CHANCE = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] extraStickChance ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("extraAppleChance").then(argument("value", DoubleArgumentType.doubleArg(0.0)).executes(context -> {
+								double val = DoubleArgumentType.getDouble(context, "value");
+								InstantLeafDecayConfig.EXTRA_APPLE_CHANCE = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] extraAppleChance ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("playerRadius").then(argument("value", DoubleArgumentType.doubleArg(1.0)).executes(context -> {
+								double val = DoubleArgumentType.getDouble(context, "value");
+								InstantLeafDecayConfig.PLAYER_RADIUS = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] playerRadius ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+
+							// --- FLOATS (Hassas Ondalıklar) ---
+							.then(literal("soundVolume").then(argument("value", FloatArgumentType.floatArg(0.0f, 1.0f)).executes(context -> {
+								float val = FloatArgumentType.getFloat(context, "value");
+								InstantLeafDecayConfig.SOUND_VOLUME = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] soundVolume ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("soundPitchMin").then(argument("value", FloatArgumentType.floatArg(0.0f, 2.0f)).executes(context -> {
+								float val = FloatArgumentType.getFloat(context, "value");
+								InstantLeafDecayConfig.SOUND_PITCH_MIN = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] soundPitchMin ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+							.then(literal("soundPitchMax").then(argument("value", FloatArgumentType.floatArg(0.0f, 2.0f)).executes(context -> {
+								float val = FloatArgumentType.getFloat(context, "value");
+								InstantLeafDecayConfig.SOUND_PITCH_MAX = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] soundPitchMax ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+
+							// --- STRINGS (Yazılar) ---
+							.then(literal("particleType").then(argument("value", StringArgumentType.word()).executes(context -> {
+								String val = StringArgumentType.getString(context, "value");
+								InstantLeafDecayConfig.PARTICLE_TYPE = val;
+								InstantLeafDecayConfig.save();
+								context.getSource().sendSuccess(() -> Component.literal("§e[HizliYaprak] particleType ayari §b" + val + " §eolarak guncellendi!"), true);
+								return 1;
+							})))
+					)
+			);
+		});
+
+		// TICK KONTROLU (Zincirleme Çürüme İçin)
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
 			if (CHAIN_QUEUE.isEmpty()) return;
 
