@@ -2,8 +2,13 @@ package com.example;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import java.io.*;
-import java.nio.file.*;
+
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +23,19 @@ public class InstantLeafDecayConfig {
     // Partikül
     public static boolean PARTICLES = true;
     public static int PARTICLE_COUNT = 8;
+    public static String PARTICLE_TYPE = "block"; // "block" = yaprak texture, "composter" = yesil yildizlar
 
     // Ses
     public static boolean SOUND = true;
     public static float SOUND_VOLUME = 0.8f;
     public static float SOUND_PITCH_MIN = 1.0f;
     public static float SOUND_PITCH_MAX = 1.2f;
+    public static double SOUND_CHANCE = 0.3;
+    public static List<String> SOUND_EVENTS = new ArrayList<>(java.util.Arrays.asList(
+            "minecraft:block.grass.break",
+            "minecraft:block.azalea_leaves.break",
+            "minecraft:block.moss.break"
+    ));
 
     // Filtreler
     public static List<String> BLACKLISTED_LEAVES = new ArrayList<>();
@@ -54,10 +66,15 @@ public class InstantLeafDecayConfig {
                     DECAY_TICKS = Math.max(1, data.decayTicks);
                     PARTICLES = data.particles;
                     PARTICLE_COUNT = Math.max(0, data.particleCount);
+                    PARTICLE_TYPE = data.particleType != null ? data.particleType : "block";
                     SOUND = data.sound;
                     SOUND_VOLUME = clamp(data.soundVolume, 0.0f, 1.0f);
                     SOUND_PITCH_MIN = Math.max(0.5f, data.soundPitchMin);
                     SOUND_PITCH_MAX = Math.max(SOUND_PITCH_MIN, data.soundPitchMax);
+                    SOUND_CHANCE = Math.max(0.0, Math.min(1.0, data.soundChance));
+                    if (data.soundEvents != null && !data.soundEvents.isEmpty()) {
+                        SOUND_EVENTS = data.soundEvents;
+                    }
                     BLACKLISTED_LEAVES = data.blacklistedLeaves != null ? data.blacklistedLeaves : new ArrayList<>();
                     DISABLED_DIMENSIONS = data.disabledDimensions != null ? data.disabledDimensions : new ArrayList<>();
                     EXTRA_SAPLING_CHANCE = Math.max(0.0, data.extraSaplingChance);
@@ -67,6 +84,7 @@ public class InstantLeafDecayConfig {
                     CHAIN_DELAY = Math.max(0, data.chainDelay);
                     REQUIRE_PLAYER_NEARBY = data.requirePlayerNearby;
                     PLAYER_RADIUS = Math.max(1.0, data.playerRadius);
+
                 }
                 // Eksik alanları doldurmak için tekrar kaydet
                 save();
@@ -111,5 +129,8 @@ public class InstantLeafDecayConfig {
         int chainDelay = CHAIN_DELAY;
         boolean requirePlayerNearby = REQUIRE_PLAYER_NEARBY;
         double playerRadius = PLAYER_RADIUS;
+        double soundChance = SOUND_CHANCE;
+        List<String> soundEvents = SOUND_EVENTS;
+        String particleType = PARTICLE_TYPE;
     }
 }

@@ -5,9 +5,11 @@ import com.example.InstantLeafDecayConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -29,6 +31,39 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LeavesBlock.class)
 public class FastLeafDecayMixin {
+
+    private static SoundEvent idc$pickSound(RandomSource random) {
+        if (InstantLeafDecayConfig.SOUND_EVENTS.isEmpty()) {
+            return SoundEvents.GRASS_BREAK;
+        }
+        String id = InstantLeafDecayConfig.SOUND_EVENTS.get(
+                random.nextInt(InstantLeafDecayConfig.SOUND_EVENTS.size()));
+        return idc$soundByName(id);
+    }
+
+    private static SoundEvent idc$soundByName(String id) {
+        switch (id) {
+            case "minecraft:block.grass.break": return SoundEvents.GRASS_BREAK;
+            case "minecraft:block.azalea_leaves.break": return SoundEvents.AZALEA_LEAVES_BREAK;
+            case "minecraft:block.moss.break": return SoundEvents.MOSS_BREAK;
+            case "minecraft:block.azalea.break": return SoundEvents.AZALEA_BREAK;
+            case "minecraft:block.flowering_azalea.break": return SoundEvents.FLOWERING_AZALEA_BREAK;
+            case "minecraft:block.cherry_leaves.break": return SoundEvents.CHERRY_LEAVES_BREAK;
+            case "minecraft:block.sweet_berry_bush.break": return SoundEvents.SWEET_BERRY_BUSH_BREAK;
+            default: return SoundEvents.GRASS_BREAK;
+        }
+    }
+
+    private static ParticleOptions idc$pickParticle(BlockState state) {
+        String type = InstantLeafDecayConfig.PARTICLE_TYPE;
+        if ("composter".equalsIgnoreCase(type)) {
+            return ParticleTypes.COMPOSTER;
+        }
+        if ("happy".equalsIgnoreCase(type)) {
+            return ParticleTypes.HAPPY_VILLAGER;
+        }
+        return new BlockParticleOption(ParticleTypes.BLOCK, state);
+    }
 
     private static void idc$rollExtraDrops(ServerLevel level, BlockPos pos, BlockState state, RandomSource random) {
         Block leafBlock = state.getBlock();
@@ -187,18 +222,19 @@ public class FastLeafDecayMixin {
             // NORMAL MOD: aninda curume
             if (InstantLeafDecayConfig.PARTICLES && InstantLeafDecayConfig.PARTICLE_COUNT > 0) {
                 level.sendParticles(
-                        new BlockParticleOption(ParticleTypes.BLOCK, state),
+                        idc$pickParticle(state),
                         pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
                         InstantLeafDecayConfig.PARTICLE_COUNT,
                         0.3, 0.3, 0.3, 0.05
                 );
             }
 
-            if (InstantLeafDecayConfig.SOUND) {
+            if (InstantLeafDecayConfig.SOUND
+                    && random.nextDouble() < InstantLeafDecayConfig.SOUND_CHANCE) {
                 float pitchRange = InstantLeafDecayConfig.SOUND_PITCH_MAX - InstantLeafDecayConfig.SOUND_PITCH_MIN;
                 float pitch = InstantLeafDecayConfig.SOUND_PITCH_MIN + (random.nextFloat() * pitchRange);
                 level.playSound(null, pos,
-                        SoundEvents.GRASS_BREAK,
+                        idc$pickSound(random),
                         SoundSource.BLOCKS,
                         InstantLeafDecayConfig.SOUND_VOLUME,
                         pitch
