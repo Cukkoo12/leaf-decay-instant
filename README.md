@@ -92,6 +92,7 @@ Supported sound IDs: `minecraft:block.grass.break`, `minecraft:block.azalea_leav
 - **Minecraft:** 26.1
 - **Requires:** Fabric API
 - **Side:** Server-side (clients don't need it)
+- **Modded Trees:** 100% compatible out-of-the-box with popular biome mods including **Biomes O' Plenty**, **Terralith**, **Twilight Forest**, and **Nature's Spirit**. (Works automatically with any mod that extends the base `LeavesBlock`).
 
 Support for older versions and Forge/NeoForge coming soon.
 
