@@ -10,8 +10,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,6 +29,71 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LeavesBlock.class)
 public class FastLeafDecayMixin {
 
+    private static void idc$rollExtraDrops(ServerLevel level, BlockPos pos, BlockState state, RandomSource random) {
+        Block leafBlock = state.getBlock();
+
+        // Fidan
+        if (InstantLeafDecayConfig.EXTRA_SAPLING_CHANCE > 0.0) {
+            Item sapling = idc$getSaplingFor(leafBlock);
+            if (sapling != null) {
+                int rolls = (int) InstantLeafDecayConfig.EXTRA_SAPLING_CHANCE;
+                double remainder = InstantLeafDecayConfig.EXTRA_SAPLING_CHANCE - rolls;
+                int total = rolls + (random.nextDouble() < remainder ? 1 : 0);
+                for (int i = 0; i < total; i++) {
+                    if (random.nextFloat() < 0.05f) {
+                        idc$spawnDrop(level, pos, new ItemStack(sapling));
+                    }
+                }
+            }
+        }
+
+        // Sopa
+        if (InstantLeafDecayConfig.EXTRA_STICK_CHANCE > 0.0) {
+            int rolls = (int) InstantLeafDecayConfig.EXTRA_STICK_CHANCE;
+            double remainder = InstantLeafDecayConfig.EXTRA_STICK_CHANCE - rolls;
+            int total = rolls + (random.nextDouble() < remainder ? 1 : 0);
+            for (int i = 0; i < total; i++) {
+                if (random.nextFloat() < 0.02f) {
+                    idc$spawnDrop(level, pos, new ItemStack(Items.STICK));
+                }
+            }
+        }
+
+        // Elma (sadece oak ve dark_oak)
+        if (InstantLeafDecayConfig.EXTRA_APPLE_CHANCE > 0.0
+                && (leafBlock == Blocks.OAK_LEAVES || leafBlock == Blocks.DARK_OAK_LEAVES)) {
+            int rolls = (int) InstantLeafDecayConfig.EXTRA_APPLE_CHANCE;
+            double remainder = InstantLeafDecayConfig.EXTRA_APPLE_CHANCE - rolls;
+            int total = rolls + (random.nextDouble() < remainder ? 1 : 0);
+            for (int i = 0; i < total; i++) {
+                if (random.nextFloat() < 0.005f) {
+                    idc$spawnDrop(level, pos, new ItemStack(Items.APPLE));
+                }
+            }
+        }
+    }
+
+    private static Item idc$getSaplingFor(Block leaf) {
+        if (leaf == Blocks.OAK_LEAVES) return Items.OAK_SAPLING;
+        if (leaf == Blocks.SPRUCE_LEAVES) return Items.SPRUCE_SAPLING;
+        if (leaf == Blocks.BIRCH_LEAVES) return Items.BIRCH_SAPLING;
+        if (leaf == Blocks.JUNGLE_LEAVES) return Items.JUNGLE_SAPLING;
+        if (leaf == Blocks.ACACIA_LEAVES) return Items.ACACIA_SAPLING;
+        if (leaf == Blocks.DARK_OAK_LEAVES) return Items.DARK_OAK_SAPLING;
+        if (leaf == Blocks.CHERRY_LEAVES) return Items.CHERRY_SAPLING;
+        if (leaf == Blocks.MANGROVE_LEAVES) return Items.MANGROVE_PROPAGULE;
+        if (leaf == Blocks.PALE_OAK_LEAVES) return Items.PALE_OAK_SAPLING;
+        return null;
+    }
+
+    private static void idc$spawnDrop(ServerLevel level, BlockPos pos, ItemStack stack) {
+        double x = pos.getX() + 0.5 + (level.getRandom().nextDouble() - 0.5) * 0.5;
+        double y = pos.getY() + 0.5;
+        double z = pos.getZ() + 0.5 + (level.getRandom().nextDouble() - 0.5) * 0.5;
+        ItemEntity entity = new ItemEntity(level, x, y, z, stack);
+        entity.setDefaultPickUpDelay();
+        level.addFreshEntity(entity);
+    }
     private static boolean idc$isBlacklisted(BlockState state) {
         if (InstantLeafDecayConfig.BLACKLISTED_LEAVES.isEmpty()) return false;
         String id = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
@@ -121,9 +192,11 @@ public class FastLeafDecayMixin {
                         pitch
                 );
             }
-
+            idc$rollExtraDrops(level, pos, state, random);
             level.destroyBlock(pos, true);
             ci.cancel();
+
         }
     }
+
 }

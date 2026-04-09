@@ -28,7 +28,10 @@ public class InstantLeafDecayConfig {
     // Filtreler
     public static List<String> BLACKLISTED_LEAVES = new ArrayList<>();
     public static List<String> DISABLED_DIMENSIONS = new ArrayList<>();
-
+    // Ekstra droplar (vanilla uzerine)
+    public static double EXTRA_SAPLING_CHANCE = 0.0;
+    public static double EXTRA_STICK_CHANCE = 0.0;
+    public static double EXTRA_APPLE_CHANCE = 0.0;
     // Performans
     public static boolean REQUIRE_PLAYER_NEARBY = false;
     public static double PLAYER_RADIUS = 64.0;
@@ -54,6 +57,9 @@ public class InstantLeafDecayConfig {
                     SOUND_PITCH_MAX = Math.max(SOUND_PITCH_MIN, data.soundPitchMax);
                     BLACKLISTED_LEAVES = data.blacklistedLeaves != null ? data.blacklistedLeaves : new ArrayList<>();
                     DISABLED_DIMENSIONS = data.disabledDimensions != null ? data.disabledDimensions : new ArrayList<>();
+                    EXTRA_SAPLING_CHANCE = Math.max(0.0, data.extraSaplingChance);
+                    EXTRA_STICK_CHANCE = Math.max(0.0, data.extraStickChance);
+                    EXTRA_APPLE_CHANCE = Math.max(0.0, data.extraAppleChance);
                     REQUIRE_PLAYER_NEARBY = data.requirePlayerNearby;
                     PLAYER_RADIUS = Math.max(1.0, data.playerRadius);
                 }
@@ -93,6 +99,9 @@ public class InstantLeafDecayConfig {
         float soundPitchMax = SOUND_PITCH_MAX;
         List<String> blacklistedLeaves = BLACKLISTED_LEAVES;
         List<String> disabledDimensions = DISABLED_DIMENSIONS;
+        double extraSaplingChance = EXTRA_SAPLING_CHANCE;
+        double extraStickChance = EXTRA_STICK_CHANCE;
+        double extraAppleChance = EXTRA_APPLE_CHANCE;
         boolean requirePlayerNearby = REQUIRE_PLAYER_NEARBY;
         double playerRadius = PLAYER_RADIUS;
     }
