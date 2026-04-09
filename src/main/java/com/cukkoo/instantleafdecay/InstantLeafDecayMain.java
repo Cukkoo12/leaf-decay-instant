@@ -1,4 +1,4 @@
-package com.example;
+package com.cukkoo.instantleafdecay;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
@@ -17,9 +17,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ExampleMod implements ModInitializer {
+public class InstantLeafDecayMain implements ModInitializer {
 
-	// pos.asLong() -> target game tick
 	public static final Map<Long, Long> CHAIN_QUEUE = new ConcurrentHashMap<>();
 
 	@Override
@@ -46,7 +45,6 @@ public class ExampleMod implements ModInitializer {
 						continue;
 					}
 
-					// Partikul
 					if (InstantLeafDecayConfig.PARTICLES && InstantLeafDecayConfig.PARTICLE_COUNT > 0) {
 						ParticleOptions particle;
 						String type = InstantLeafDecayConfig.PARTICLE_TYPE;
@@ -65,7 +63,6 @@ public class ExampleMod implements ModInitializer {
 						);
 					}
 
-					// Ses (sansli ise)
 					if (InstantLeafDecayConfig.SOUND
 							&& level.getRandom().nextDouble() < InstantLeafDecayConfig.SOUND_CHANCE) {
 						float pitchRange = InstantLeafDecayConfig.SOUND_PITCH_MAX - InstantLeafDecayConfig.SOUND_PITCH_MIN;

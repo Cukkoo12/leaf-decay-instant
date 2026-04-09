@@ -7,12 +7,12 @@
 	"authors": [
 		"Musa"
 	],
-	"license": "CC0-1.0",
+	"license": "MIT",
 	"icon": "assets/instant_leaf_decay/icon.png",
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"com.example.ExampleMod"
+			"com.cukkoo.instantleafdecay.InstantLeafDecayMain"
 		]
 	},
 	"mixins": [

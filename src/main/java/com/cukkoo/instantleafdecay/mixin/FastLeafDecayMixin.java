@@ -1,7 +1,9 @@
-package com.example.mixin;
+package com.cukkoo.instantleafdecay.mixin;
 
-import com.example.ExampleMod;
-import com.example.InstantLeafDecayConfig;
+import com.cukkoo.instantleafdecay.InstantLeafDecayMain;
+import com.cukkoo.instantleafdecay.InstantLeafDecayConfig;
+
+// ... (Geri kalan tüm importlar ve kod aynı)
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -210,10 +212,10 @@ public class FastLeafDecayMixin {
             // ZINCIRLEME MOD: kuyruga ekle, vanilla tick'i iptal et
             if (InstantLeafDecayConfig.CHAIN_DECAY && InstantLeafDecayConfig.CHAIN_DELAY > 0) {
                 long key = pos.asLong();
-                if (!ExampleMod.CHAIN_QUEUE.containsKey(key)) {
+                if (!InstantLeafDecayMain.CHAIN_QUEUE.containsKey(key)) {
                     int extra = random.nextInt(InstantLeafDecayConfig.CHAIN_DELAY * 6 + 1);
                     long target = level.getGameTime() + InstantLeafDecayConfig.DECAY_TICKS + extra;
-                    ExampleMod.CHAIN_QUEUE.put(key, target);
+                    InstantLeafDecayMain.CHAIN_QUEUE.put(key, target);
                 }
                 ci.cancel();
                 return;
