@@ -2,8 +2,6 @@ package com.cukkoo.instantleafdecay.mixin;
 
 import com.cukkoo.instantleafdecay.InstantLeafDecayMain;
 import com.cukkoo.instantleafdecay.InstantLeafDecayConfig;
-
-// ... (Geri kalan tüm importlar ve kod aynı)
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
