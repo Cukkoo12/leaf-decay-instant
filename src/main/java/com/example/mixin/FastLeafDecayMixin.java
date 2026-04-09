@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -22,6 +23,32 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LeavesBlock.class)
 public class FastLeafDecayMixin {
 
+    private static boolean idc$isBlacklisted(BlockState state) {
+        if (InstantLeafDecayConfig.BLACKLISTED_LEAVES.isEmpty()) return false;
+        String id = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
+        return InstantLeafDecayConfig.BLACKLISTED_LEAVES.contains(id);
+    }
+
+    private static boolean idc$isDimensionDisabled(ServerLevel level) {
+        if (InstantLeafDecayConfig.DISABLED_DIMENSIONS.isEmpty()) return false;
+        String dim = level.dimension().toString();
+        return InstantLeafDecayConfig.DISABLED_DIMENSIONS.contains(dim);
+    }
+
+    private static boolean idc$shouldSkip(BlockState state, ServerLevel level, BlockPos pos) {
+        if (!InstantLeafDecayConfig.ENABLED) return true;
+        if (idc$isBlacklisted(state)) return true;
+        if (idc$isDimensionDisabled(level)) return true;
+        if (InstantLeafDecayConfig.REQUIRE_PLAYER_NEARBY) {
+            if (level.getNearestPlayer(
+                    pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                    InstantLeafDecayConfig.PLAYER_RADIUS, false) == null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Inject(method = "updateShape", at = @At("RETURN"))
     private void planliKir(
             BlockState state,
@@ -34,7 +61,11 @@ public class FastLeafDecayMixin {
             RandomSource random,
             CallbackInfoReturnable<BlockState> cir) {
 
+        if (!InstantLeafDecayConfig.ENABLED) return;
+
         BlockState newState = cir.getReturnValue();
+        if (idc$isBlacklisted(newState)) return;
+
         if (!newState.getValue(LeavesBlock.PERSISTENT)
                 && newState.getValue(LeavesBlock.DISTANCE) >= 5) {
             ticks.scheduleTick(pos, newState.getBlock(), InstantLeafDecayConfig.DECAY_TICKS);
@@ -48,6 +79,9 @@ public class FastLeafDecayMixin {
             BlockPos pos,
             RandomSource random,
             CallbackInfo ci) {
+
+        if (!InstantLeafDecayConfig.ENABLED) return;
+        if (idc$isBlacklisted(state)) return;
 
         if (!state.getValue(LeavesBlock.PERSISTENT)
                 && state.getValue(LeavesBlock.DISTANCE) >= 5) {
@@ -63,22 +97,28 @@ public class FastLeafDecayMixin {
             RandomSource random,
             CallbackInfo ci) {
 
+        if (idc$shouldSkip(state, level, pos)) return;
+
         if (!state.getValue(LeavesBlock.PERSISTENT)
                 && state.getValue(LeavesBlock.DISTANCE) >= 5) {
 
-            if (InstantLeafDecayConfig.PARTICLES) {
+            if (InstantLeafDecayConfig.PARTICLES && InstantLeafDecayConfig.PARTICLE_COUNT > 0) {
                 level.sendParticles(
                         new BlockParticleOption(ParticleTypes.BLOCK, state),
                         pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
-                        8, 0.3, 0.3, 0.3, 0.05
+                        InstantLeafDecayConfig.PARTICLE_COUNT,
+                        0.3, 0.3, 0.3, 0.05
                 );
             }
 
             if (InstantLeafDecayConfig.SOUND) {
+                float pitchRange = InstantLeafDecayConfig.SOUND_PITCH_MAX - InstantLeafDecayConfig.SOUND_PITCH_MIN;
+                float pitch = InstantLeafDecayConfig.SOUND_PITCH_MIN + (random.nextFloat() * pitchRange);
                 level.playSound(null, pos,
                         SoundEvents.GRASS_BREAK,
                         SoundSource.BLOCKS,
-                        0.8f, 1.0f + (random.nextFloat() * 0.2f)
+                        InstantLeafDecayConfig.SOUND_VOLUME,
+                        pitch
                 );
             }
 
