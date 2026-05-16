@@ -110,16 +110,6 @@ Config file is created on first launch at `config/instant_leaf_decay.json`.
 
 ---
 
-## Compatibility
-
-- **Loader:** Fabric
-- **Minecraft:** 26.1.x, 26.2-snapshot
-- **Requires:** Fabric API
-- **Side:** Server-side (clients don't need it)
-- **Modded Trees:** Works automatically with any mod extending `LeavesBlock` (Biomes O' Plenty, Terralith, etc.)
-
----
-
 ## License
 
 MIT — free to use, modify, and include in modpacks. No permission needed.
