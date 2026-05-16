@@ -1,6 +1,6 @@
 # Leaf Decay Instant
 
-![leaf_decay](leaf_decay.gif)
+![leaf_decay](https://raw.githubusercontent.com/Cukkoo12/leaf-decay-instant/main/leaf_decay.gif)
 
 Tired of floating leaves after cutting down a tree? **Leaf Decay Instant** removes them immediately — no more ugly leaf blobs hovering in the sky.
 
