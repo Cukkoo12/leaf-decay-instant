@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'net.minecraftforge.gradle' version '[7.0.17,8)'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+    archivesName = project.archives_base_name
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+minecraft {
+    runs {
+        configureEach {
+            workingDir = layout.projectDirectory.dir('run')
+            systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        }
+        register('client') { args '--mixin', 'instant_leaf_decay.mixins.json' }
+        register('server') { args '--nogui' }
+    }
+}
+
+repositories {
+    minecraft.mavenizer(it)
+    maven fg.forgeMaven
+    maven fg.minecraftLibsMaven
+    mavenCentral()
+}
+
+dependencies {
+    implementation minecraft.dependency("net.minecraftforge:forge:${project.forge_version}")
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mod_id", project.mod_id
+    filteringCharset = "UTF-8"
+    filesMatching("META-INF/mods.toml") { expand "version": project.version, "mod_id": project.mod_id }
+}
+
+jar {
+    manifest {
+        attributes([
+            'MixinConfigs': 'instant_leaf_decay.mixins.json',
+            'Specification-Title': project.mod_id,
+            'Specification-Version': project.version,
+            'Implementation-Title': project.mod_id,
+            'Implementation-Version': project.version
+        ])
+    }
+}
