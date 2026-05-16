@@ -1,5 +1,9 @@
 # Leaf Decay Instant
 
+![Fabric](https://img.shields.io/badge/loader-Fabric-dbd0b4?style=flat-square)
+![Minecraft](https://img.shields.io/badge/minecraft-26.1-5e7c16?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
+
 ![leaf_decay](https://raw.githubusercontent.com/Cukkoo12/leaf-decay-instant/main/leaf_decay.gif)
 
 Tired of floating leaves after cutting down a tree? **Leaf Decay Instant** removes them immediately — no more ugly leaf blobs hovering in the sky.
@@ -21,13 +25,6 @@ Tired of floating leaves after cutting down a tree? **Leaf Decay Instant** remov
 
 ---
 
-## Installation
-
-1. Install [Fabric Loader](https://fabricmc.net/use/)
-2. Install [Fabric API](https://modrinth.com/mod/fabric-api)
-3. Download and drop the `.jar` into your `mods` folder
-
----
 
 ## Commands
 
@@ -120,7 +117,6 @@ Config file is created on first launch at `config/instant_leaf_decay.json`.
 - **Requires:** Fabric API
 - **Side:** Server-side (clients don't need it)
 - **Modded Trees:** Works automatically with any mod extending `LeavesBlock` (Biomes O' Plenty, Terralith, etc.)
-- **Backports:** 1.21.x, 1.20.1, 1.19.2, 1.18.2, 1.16.5
 
 ---
 
