@@ -13,6 +13,7 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 minecraft {
+    mappings channel: 'official', version: project.minecraft_version
     runs {
         configureEach {
             workingDir = layout.projectDirectory.dir('run')
@@ -39,6 +40,11 @@ processResources {
     inputs.property "mod_id", project.mod_id
     filteringCharset = "UTF-8"
     filesMatching("META-INF/mods.toml") { expand "version": project.version, "mod_id": project.mod_id }
+}
+
+// FG7 dev mod scanning needs mods.toml coexisting with classes in same directory.
+tasks.named('compileJava') {
+    destinationDirectory = file("$buildDir/resources/main")
 }
 
 jar {

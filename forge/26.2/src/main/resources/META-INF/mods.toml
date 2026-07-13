@@ -1,0 +1,29 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="${mod_id}"
+className="com.cukkoo.instantleafdecay.InstantLeafDecayMain"
+version="${version}"
+displayName="Instant Leaf Decay"
+logoFile="instant_leaf_decay.png"
+credits="Cukkoo"
+authors="Cukkoo"
+description='''
+Leaves decay instantly when trees are cut. No more floating leaf blobs!
+'''
+
+[[dependencies.instant_leaf_decay]]
+modId="forge"
+mandatory=true
+versionRange="[65,)"
+ordering="NONE"
+side="BOTH"
+
+[[dependencies.instant_leaf_decay]]
+modId="minecraft"
+mandatory=true
+versionRange="[26.2,26.3)"
+ordering="NONE"
+side="BOTH"
